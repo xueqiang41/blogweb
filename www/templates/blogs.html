@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}日志{% endblock %}
+
+{% block content %}
+<div class="row">
+      <div class="col-sm-8 blog-main">
+         {% for blog in blogs%}
+          <div class="blog-post">
+            <h2 class="blog-post-title">{{blog.name}}</h2>
+            <p class="blog-post-meta">发表于{{blog.create_at|datetime}}</p>
+
+            <p>{{blog.summary}} </p>
+            <p><a href="/blog/{{ blog.id }}">继续阅读<span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span> </a></p>
+            <hr>
+          </div><!-- /.blog-post -->
+          {%endfor%}
+
+          <nav>
+            <ul class="pager">
+                {%if page.has_previous%}
+                     <li class="previous"><a href="/?page={{page.previous}}">上一页</a></li>
+                {% else %}
+                <li class="previous disabled"><a href="#">首页</a></li>
+                {%endif%}
+                {%if page.has_next%}
+                <li class="next"><a href="/?page={{page.next}}">下一页</a></li>
+                {% else %}
+                <li class="next disabled"><a href="#">尾页</a></li>
+                {%endif%}
+            </ul>
+          </nav>
+
+      </div><!-- /.blog-main -->
+    
+      <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+          <div class="sidebar-module">
+            <h4>友情链接</h4>
+            <hr>
+            <ol class="list-unstyled">
+              <li><a href="#">GitHub</a></li><hr>
+              <li><a href="#">Twitter</a></li><hr>
+              <li><a href="#">Facebook</a></li><hr>
+            </ol>
+          </div>
+      </div><!-- /.blog-sidebar -->
+    </div>
+{% endblock %}
+
+{% block javascript %}
+<script type="text/javascript">
+    $("#log").attr("class","active");
+</script>
+{% endblock %}

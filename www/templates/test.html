@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <title>测试博客网站首页</title>
+</head>
+<body>
+    <h1>所有用户：</h1>
+    {% for u in users%}
+    <h3>{{u.name}} / {{u.email}}</h3>
+    {% endfor %}
+</body>
+</html>

@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+      
+    <link rel="icon" href="/favicon.ico">
+    <title>编辑日志--blog</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"  href="../static/css/bootstrap.min.css">
+
+    <!--blog.css -->
+    <link rel="stylesheet" type="text/css" href="../static/css/blog.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+    <nav class="navbar navbar-default navbar-fixed-top">
+       <div class="container">
+           <div class="navbar-header">
+               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                   <span class="sr-only">Toggle navigation</span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+                   <span class="icon-bar"></span>
+               </button>
+               <a class="navbar-brand" href="#">Blogsystem</a>
+           </div>
+           <div id="navbar" class="navbar-collapse collapse">
+               <ul class="nav navbar-nav">
+                   <li id="log" ><a href="/">日志</a></li>
+                   <li><a href="#about">教程</a></li>
+                   <li><a href="#contact">源码</a></li>
+                   <!-- 下拉菜单 -->
+                   <li class="dropdown">
+                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">测试<span class="caret"></span></a>
+                       <ul class="dropdown-menu">
+                           <li><a href="#">Action</a></li>
+                       </ul>
+                   </li>
+               </ul>
+               <ul class="nav navbar-nav navbar-right ">
+                
+                   <li class="dropdown">
+                       <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">88<span class="caret"></span></a>
+                       <ul class="dropdown-menu">
+                           <li><a href="/signout">登出</a></li>
+                       </ul>
+                   </li>
+                
+               </ul>
+           </div>
+       </div>
+   </nav>
+
+  
+  <div class="container middle">
+    
+
+      <div class="container">
+        <ul class="nav nav-pills nav-justified anther">
+        <li role="presentation" class="active"><a href="/manage/blogs">日志</a></li>
+        <li role="presentation"><a href="#">用户</a></li>
+        <li role="presentation"><a href="#">评论</a></li>
+        </ul>
+      </div>
+
+      <div class="container anther">
+        <a href="/manage/blogs/create" class="btn btn-primary "> +   日志</a>    
+      </div>
+
+      <div id="vm" class="container">
+        
+         <div class="alert alert-danger hide" id="danger_alert" role="alert">
+          <!--<a href="#" class="close" data-dismiss="alert">&times;</a>-->
+           <span id="errinfo"></span>
+        </div>
+
+        <table class="table">
+           <thead>
+              <tr>
+                 <th>标题 / 摘要</th>
+                 <th>作者</th>
+                 <th>创建时间</th>
+                 <th>操作</th>
+              </tr>
+           </thead>
+           <tbody>
+              <tr v-repeat="blog:blogs">
+                 <td> 
+                  <a target="_blank" v-attr="href: '/blog/'+blog.id" v-text="blog.name"></a>
+                </td>
+                 <td>
+                  <a target="_blank" v-attr="href: '/user/'+blog.user_id" v-text="blog.user_name"></a>
+                </td>
+                <td>
+                  <span v-text="blog.created_at.toDateTime()"></span>
+                </td>
+                <td>
+                  <a href="#0" v-on="click: edit_blog(blog)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                    <a href="#0" v-on="click: delete_blog(blog)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                </td>
+              </tr>
+           </tbody>
+        </table>
+
+        <div class="pages">
+          <ul class="pagination" >
+            <li class="disabled" id="prev"><a href="#0" v-on="click: get_prev(page)">&laquo;</a></li>
+            <li class="active"><span v-text="1">1</span></li>
+            <li><a href="#0" id="next" v-on="click: get_next(page)">&raquo;</a></li>
+          </ul>
+        </div>
+    </div>
+
+
+  </div>
+    
+
+
+   <div class="footer">
+      <div class="container">
+          <p>Powered by <a href="#">Blog Python Webapp</a>. Copyright &copy; 2015. [<a href="/manage/" target="_blank">Manage</a>]</p>
+          <p><a href="#" target="_blank">www.xueqiang.com</a>. All rights reserved.</p>
+      </div>
+  </div>
+
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/md5.js"></script>
+    <script src="../static/js/vue.min.js"></script>
+
+     
+<script type="text/javascript">
+    
+    var ID = '',action = '/api/blogs';
+
+    function initVM(blog){
+      alert("yes")
+      var vm = new Vue({
+        el : '#vm',
+        data:blog,
+        methods:{
+          submit:function(event){
+            alert("yes2");
+            event.preventDefault();
+            //var $form  = $("#vm").find('form');
+            $.postJSON(action, this.$data, function (err, r) {
+              alert("yes4");
+                    if (err) {
+                        $form.showFormError(err);
+                    }
+                    else {
+                      alert("yes3");
+                        //return location.assign('/api/blogs/' + r.id);
+                    }
+                });
+          }
+        }
+      });
+      $('#vm').show();
+    }
+
+
+    $(function(){
+
+      if (ID){
+          
+      }else{
+        //初始化model
+         initVM({
+            name: '',
+            summary: '',
+            content: ''
+        });
+      }
+    });
+    
+ </script>
+
+ 
+     
+</body>
+</html>

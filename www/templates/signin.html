@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> 
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+  
+    <link rel="icon" href="/favicon.ico">
+    <title>登陆--blog</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet"  href="../static/css/bootstrap.min.css">
+
+    <!--blog.css -->
+    <link rel="stylesheet" type="text/css" href="../static/css/blog.css">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="//cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="//cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+<body>
+    
+
+    <div class="panel panel-default panel-signin">
+      <div class="panel-heading">
+        <h3 class="form-signin-heading">用户登陆</h3>
+      </div>
+      
+      <div class="panel-body">
+        <form class="form-signin">
+          <div class="alert alert-danger hide" id="danger_alert" role="alert">
+            <!--<a href="#" class="close" data-dismiss="alert">&times;</a>-->
+            <span id="errinfo"></span>
+            <a href="/register" id="alert-link-id" class="alert-link"></a>
+          </div>
+          <label for="inputEmail" class="sr-only">Email address</label>
+          <input type="email" id="inputEmail" class="form-control" placeholder="电子邮件" required autofocus>
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input type="password" id="inputPassword" class="form-control" placeholder="输入口令" required>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value="remember-me"> 记住我
+            </label>
+          </div>
+          <button class="btn btn-lg btn-primary btn-block " id="submit"  type="button">登陆</button>
+        </form>
+      </div>
+    </div> <!-- /container -->
+
+
+   <!-- Bootstrap core JavaScript
+    ================================================== -->
+
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/md5.js"></script>
+    <script type="text/javascript">
+    
+      function validateEmail(email) {
+        var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
+        return re.test(email.toLowerCase());
+      }
+
+      function showError(err){
+        $("#danger_alert").attr("class","alert alert-danger");
+        $("#errinfo").text(err);
+      }
+      
+      $("#submit").click(function(){
+
+            if (!validateEmail($("#inputEmail").val().trim().toLowerCase())) {
+              return showError('请输入正确的Email地址');
+            }
+
+            if ($("#inputPassword").val().length < 6){
+              return showError("密码少于6位");
+            }
+
+            $.ajax(
+            {
+              type:"POST",
+              dataType:"json",
+              url:"/api/authenticate",
+              contentType : 'application/json',
+              data:JSON.stringify({
+                email: $("#inputEmail").val().trim().toLowerCase(),
+                passwd: CryptoJS.MD5($("#inputPassword").val()).toString()
+              }),
+              success:function(data){
+                  //var json = eval(data);
+                  //var err = json.error+":"+json.data+":"+json.message
+                  if (data && data.error)
+                  {
+                      if (data.data == "注册")
+                      {
+                        showError(data.error+":"+data.message)
+                        $("#alert-link-id").text(data.data);
+                      }
+                      else
+                      {
+                        var err = data.error+":"+data.data+":"+data.message;
+                        showError(err);
+                      }
+                  }
+                  else
+                  {
+                      location.href ="/";
+                  }
+              },
+              error:function(textStatus, errorThrown){
+                  alert("系统ajax交互错误: " +errorThrown);
+              }
+            });
+          }
+
+      );
+ </script>
+     
+</body>
+</html>

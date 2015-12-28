@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}编辑日志{% endblock %}
+
+
+{% block content %}
+
+      <div class="container">
+        <ul class="nav nav-pills nav-justified anther">
+        <li role="presentation" class="active"><a href="/manage/blogs">日志</a></li>
+        <li role="presentation"><a href="#">用户</a></li>
+        <li role="presentation"><a href="#">评论</a></li>
+        </ul>
+        </div>
+
+
+      <div id="vm" class="container ">
+        
+        
+
+         <div class="alert alert-danger hide" id="danger_alert" role="alert">
+          <!--<a href="#" class="close" data-dismiss="alert">&times;</a>-->
+          <span id="errinfo"></span>
+        </div>
+
+         <form @submit.prevent class="form-register">
+            
+            <label for="name" >标题:</label>
+             <input  v-model="name" name="name" type="text" class="form-control" placeholder="标题" >
+            <label for="summary" >摘要:</label>
+             <textarea v-model="summary" rows="4" name="summary" placeholder="摘要" class="form-control" style="resize:none;"></textarea>
+            <label for="content" >内容:</label>
+             <textarea v-model="content" rows="16" name="content" placeholder="内容" class="form-control" style="resize:none;"></textarea>
+          
+            <button class="btn  btn-primary " type="button"  v-on:click="save" >保存</button>
+            <a href="/manage/blogs" class="btn btn-primary"> 取消</a>
+        </form>
+    </div>
+
+{% endblock %}
+
+ {% block javascript %} 
+<script type="text/javascript">
+    
+    var ID = '{{ id }}',action = '{{ action }}';
+
+    function showError(err){
+      $("#danger_alert").attr("class","alert alert-danger");
+      $("#errinfo").text(err);
+    }
+
+    function initVM(blog){
+
+      var vm = new Vue({
+        el : '#vm',
+        data:blog,
+        methods:{
+          save:function(){
+            //event.preventDefault();
+
+          $.ajax(
+          {
+            type:"POST",
+            dataType:"json",
+            url:action,
+            contentType : 'application/json',
+            data:JSON.stringify(this.$data),
+            success:function(data){
+                if (data && data.error)
+                {
+                    var err = data.error+":"+data.data+":"+data.message;
+                    showError(err);
+                }
+                else
+                {
+                    location.href ="/manage/blogs";
+                    //alert("here1");
+                }
+            },
+            error:function(textStatus, errorThrown){
+                alert("系统ajax交互错误: " +errorThrown);
+            }
+          });
+          }
+        }
+      });
+      $('#vm').show();
+    }
+
+
+    $(function(){
+
+      if (ID){
+          $.getJSON("/api/blogs/"+ID,function(results){
+            initVM(results);
+          });
+      }else{
+        //初始化model
+         initVM({
+            name: '',
+            summary: '',
+            content: ''
+        });
+      }
+    });
+    
+ </script>
+
+ {% endblock %}

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}日志管理{% endblock %}
+
+
+{% block content %}
+
+
+      <div class="container">
+        <ul class="nav nav-pills nav-justified anther">
+        <li role="presentation" class="active"><a href="/manage/blogs">日志</a></li>
+        <li role="presentation"><a href="#">用户</a></li>
+        <li role="presentation"><a href="#">评论</a></li>
+        </ul>
+      </div>
+
+      <div class="container anther">
+        <a href="/manage/blogs/create" class="btn btn-primary "> +   日志</a>    
+      </div>
+
+      <div id="vm" class="container">
+        
+         <div class="alert alert-danger hide" id="danger_alert" role="alert">
+          <!--<a href="#" class="close" data-dismiss="alert">&times;</a>-->
+           <span id="errinfo"></span>
+        </div>
+
+        <table class="table">
+           <thead>
+              <tr>
+                 <th>标题 / 摘要</th>
+                 <th>作者</th>
+                 <th>创建时间</th>
+                 <th>操作</th>
+              </tr>
+           </thead>
+           <tbody>
+              <tr v-for = "blog in blogs">
+                 <td> 
+                  <span v-text="blog.name"></span>
+                </td>
+                 <td>
+                  <span v-text="blog.username"></span>
+                </td>
+                <td>
+                  <span v-text="blog.create_at.toDateTime()"></span>
+                </td>
+                <td>
+                  <a href="#0" v-on:click="edit_blog(blog)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+                    <a href="#0" v-on:click="delete_blog(blog)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                </td>
+              </tr>
+           </tbody>
+        </table>
+
+        <div class="pages">
+          <ul class="pagination" >
+            <li  id="prev"><a href="#0" v-on:click="page_prev">&laquo;</a></li>
+            <li ><span v-text="page.page_index"></span></li>
+            <li id="next"><a href="#0" v-on:click="page_next">&raquo;</a></li>
+          </ul>
+        </div>
+    </div>
+
+{% endblock %}
+
+ {% block javascript %} 
+<script type="text/javascript">
+
+    function showError(err){
+      $("#danger_alert").attr("class","alert alert-danger");
+      $("#errinfo").text(err);
+    }
+
+    function showPage(page){
+
+      if (page.has_previous == "1"){
+         $("#prev").attr("class","active");
+      }
+      else{
+        $("#prev").attr("class","disabled");
+      }
+
+      if (page.has_next == "1"){
+        $("#next").attr("class","active");
+      }
+      else{
+        $("#next").attr("class","disabled");
+      }
+    }
+
+    function initVM(data){
+      var vm = new Vue({
+        el : '#vm',
+        data:{
+          blogs:data.blogs,
+          page:data.page
+        },
+        methods:{
+          edit_blog:function(blog){
+               location.assign('/manage/blogs/edit?id=' + blog.id);
+          },
+          delete_blog:function(blog){
+              var index = this.page.page_index;
+              if (confirm('确认要删除“' + blog.name + '”？删除后不可恢复！')) {
+                    $.ajax(
+                    {
+                      type:"POST",
+                      dataType:"json",
+                      url:'/api/blogs/' + blog.id + '/delete',
+                      contentType : 'application/json',
+                      data:JSON.stringify(
+                        {id:blog.id}),
+                      success:function(data){
+                          if (data && data.error)
+                          {
+                              var err = data.error+":"+data.data+":"+data.message;
+                              showError(err);
+                          }
+                          else
+                          {
+                              //location.href ="/";
+                              //alert("ddf");
+                              alert(index);
+                              var href = "/manage/blogs?page="+index
+                              location.href  = href;
+                          }
+                      },
+                      error:function(textStatus, errorThrown){
+                          alert("系统ajax交互错误: " +errorThrown);
+                      }
+                    });
+                }
+          },
+          page_prev:function(){
+
+            if (this.page.has_previous == '0')
+                 return;
+            $.getJSON("/api/blogs",{ 
+              'page':this.page.page_index - 1
+              },function(results){
+                showPage(results.page);
+                refreshData(results);                
+            }); 
+          },
+          page_next:function(){
+            if (this.page.has_next == '0')
+                 return;
+            $.getJSON("/api/blogs",{ 
+              'page':this.page.page_index  + 1
+              },function(results){
+                
+                //initVM(results);
+                showPage(results.page);
+                refreshData(results);
+                //vm.show(); 
+            }); 
+
+          }
+        }
+      });
+      //$('#vm').show();
+      function refreshData(results){
+        vm.$data.page = results.page;
+        vm.$data.blogs = results.blogs;
+      }
+    }
+
+
+    $(function(){
+      $.getJSON("/api/blogs",{ 
+        'page':{{page_index}}
+        },function(results){
+          showPage(results.page);
+          initVM(results);
+      }); 
+    });
+    
+ </script>
+
+ {% endblock %}

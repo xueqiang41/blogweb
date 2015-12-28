@@ -1,0 +1,109 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+  margin-top: 30px;
+}
+
+/*
+ * Override Bootstrap's default container.
+ */
+
+@media (min-width: 1200px) {
+  .container {
+    width: 970px;
+  }
+}
+
+/*body nav*/
+.anther{
+  margin-bottom: 20px;
+}
+
+/*blog*/
+.blog-main {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.blog-post {
+  margin-bottom: 60px;
+}
+.blog-post-title {
+  margin-bottom: 5px;
+  font-size: 40px;
+}
+.blog-post-meta {
+  margin-bottom: 20px;
+  color: #999;
+}
+
+/* Pagination */
+.pager {
+  margin-bottom: 60px;
+  text-align: left;
+}
+.pager > li > a {
+  width: 140px;
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 30px;
+}
+/* Sidebar modules for boxing content */
+.sidebar-module {
+  padding: 15px;
+  margin: 0 -15px 15px;
+}
+
+/*register*/
+.form-register .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+/*sign*/
+.panel-signin {
+  width: 350px;
+  margin:0 auto;
+  margin-top: 200px;
+
+}
+.panel-signin h3{
+  margin-top: 0px;
+  margin-bottom: 0px;
+  text-align: center;
+}
+
+.pages{
+  text-align: center;
+}
+
+.panel-signin .form-control{
+  padding: 10px;
+  margin-bottom: 13px;
+  font-size: 16px;
+}
+
+.middle{
+  margin-bottom: 100px;
+  margin-top:60px;
+}
+
+/*footer*/
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 80px;
+  text-align: center;
+  background-color:#eee; 
+  border-top:1px solid #ccc;
+}

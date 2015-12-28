@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}注册{% endblock %}
+
+
+{% block content %}
+<div class="row">
+      <div class="col-sm-8 ">
+         <h1>欢迎注册</h1>
+         <div class="alert alert-danger hide" id="danger_alert" role="alert">
+          <!--<a href="#" class="close" data-dismiss="alert">&times;</a>-->
+          <span id="errinfo"></span>
+        </div>
+         <form id="registerForm" class="form-register">
+            <label for="name" >名字:</label>
+            <input type="text" id="inputName" class="form-control" placeholder="名字" required autofocus>
+            <label for="email" >电子邮箱:</label>
+            <input type="email" id="inputEmail" class="form-control" placeholder="your-name@example.com" required>
+            <label for="password1" >输入口令:</label>
+            <input type="password" id="inputPassword1" class="form-control" placeholder="输入口令" required>
+            <label for="password1" >重复口令:</label>
+            <input type="password" id="inputPassword2" class="form-control" placeholder="重复口令" required>
+          
+            <button class="btn  btn-primary " type="button" id="submit">注册</button>
+        </form>
+      </div>
+    </div>
+{% endblock %}
+
+ {% block javascript %} 
+<script type="text/javascript">
+
+    $("#register").attr("class","active");
+    
+    function validateEmail(email) {
+      var re = /^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$/;
+      return re.test(email.toLowerCase());
+    }
+
+    function showError(err){
+      $("#danger_alert").attr("class","alert alert-danger");
+      $("#errinfo").text(err);
+    }
+    
+    $("#submit").click(function(){
+
+          if ($("#inputName").val().length <= 0){
+            return showError("请输入名字");
+          }
+
+          if (!validateEmail($("#inputEmail").val().trim().toLowerCase())) {
+            return showError('请输入正确的Email地址');
+          }
+
+          if ($("#inputPassword1").val().length < 6){
+            return showError("密码少于6位");
+          }
+          if ($("#inputPassword1").val() != $("#inputPassword2").val()){
+            return showError("两次输入的口令不一致");
+          }
+
+          $.ajax(
+          {
+            type:"POST",
+            dataType:"json",
+            url:"/api/users",
+            contentType : 'application/json',
+            data:JSON.stringify({
+              name: $("#inputName").val(),
+              email: $("#inputEmail").val().trim().toLowerCase(),
+              passwd: CryptoJS.MD5($("#inputPassword1").val()).toString()
+            }),
+            success:function(data){
+                //var json = eval(data);
+                //var err = json.error+":"+json.data+":"+json.message
+                if (data && data.error)
+                {
+                    var err = data.error+":"+data.data+":"+data.message;
+                    showError(err);
+                }
+                else
+                {
+                    location.href ="/";
+                }
+            },
+            error:function(textStatus, errorThrown){
+                alert("系统ajax交互错误: " +errorThrown);
+            }
+          });
+        }
+
+    );
+ </script>
+
+ {% endblock %}
